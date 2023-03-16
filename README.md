@@ -1,6 +1,6 @@
 # go-request
 
-Simple HTTP Request library for golang.
+Simple HTTP Request library for golang. Default timeout is 60 seconds. You can change it by giving config while creating client.
 
 Usage:
 ```
