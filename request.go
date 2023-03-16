@@ -42,33 +42,30 @@ func NewHttpRequestClient(config ...Config) httpRequest {
 
 // Sends a http GET request with given parameters
 func (r httpRequest) Get(url string, headers map[string]string) (*http.Response, error) {
-	return sendRequest(r.Config.TimeoutSeconds, http.MethodGet, url, headers, nil)
+	return sendRequest(r.Client, http.MethodGet, url, headers, nil)
 }
 
 // Sends a POST request to the specified URL with the specified headers and body.
 func (r httpRequest) Post(url string, headers map[string]string, body []byte) (*http.Response, error) {
-	return sendRequest(r.Config.TimeoutSeconds, http.MethodPost, url, headers, body)
+	return sendRequest(r.Client, http.MethodPost, url, headers, body)
 }
 
 // Sends a PUT request to the specified URL with the specified headers and body.
 func (r httpRequest) Put(url string, headers map[string]string, body []byte) (*http.Response, error) {
-	return sendRequest(r.Config.TimeoutSeconds, http.MethodPut, url, headers, body)
+	return sendRequest(r.Client, http.MethodPut, url, headers, body)
 }
 
 // Sends a PATCH request to the specified URL with the specified headers and body.
 func (r httpRequest) Patch(url string, headers map[string]string, body []byte) (*http.Response, error) {
-	return sendRequest(r.Config.TimeoutSeconds, http.MethodPatch, url, headers, body)
+	return sendRequest(r.Client, http.MethodPatch, url, headers, body)
 }
 
 // Sends a DELETE request to the specified URL with the specified headers and body.
 func (r httpRequest) Delete(url string, headers map[string]string) (*http.Response, error) {
-	return sendRequest(r.Config.TimeoutSeconds, http.MethodDelete, url, headers, nil)
+	return sendRequest(r.Client, http.MethodDelete, url, headers, nil)
 }
 
-func sendRequest(timeSeconds int, method string, url string, headers map[string]string, body []byte) (*http.Response, error) {
-
-	// Create client for the service
-	client := newHttpClient(timeSeconds)
+func sendRequest(client http.Client, method string, url string, headers map[string]string, body []byte) (*http.Response, error) {
 
 	reqBody := new(bytes.Buffer)
 	if body != nil {
