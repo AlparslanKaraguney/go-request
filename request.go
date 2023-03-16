@@ -22,7 +22,8 @@ type httpRequest struct {
 	Client http.Client
 }
 
-// newHttpClient creates a new http client with the given configuration
+// Creates a new http client with the given configuration
+// Use default config if not given any
 func NewHttpRequestClient(config ...Config) httpRequest {
 	if len(config) < 1 {
 		return httpRequest{
@@ -39,38 +40,46 @@ func NewHttpRequestClient(config ...Config) httpRequest {
 	}
 }
 
+// Sends a http GET request with given parameters
 func (r httpRequest) Get(url string, headers map[string]string) (*http.Response, error) {
-	// Create client for the service
-	client := newHttpClient(r.Config.TimeoutSeconds)
-
-	// Create a new request
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	setResponseHeaders(req, headers)
-
-	// Send the request
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return sendRequest(r.Config.TimeoutSeconds, http.MethodGet, url, headers, nil)
 }
 
-// SendRequestPost sends a POST request to the specified URL with the specified headers and body.
+// Sends a POST request to the specified URL with the specified headers and body.
 func (r httpRequest) Post(url string, headers map[string]string, body []byte) (*http.Response, error) {
+	return sendRequest(r.Config.TimeoutSeconds, http.MethodPost, url, headers, body)
+}
+
+// Sends a PUT request to the specified URL with the specified headers and body.
+func (r httpRequest) Put(url string, headers map[string]string, body []byte) (*http.Response, error) {
+	return sendRequest(r.Config.TimeoutSeconds, http.MethodPut, url, headers, body)
+}
+
+// Sends a PATCH request to the specified URL with the specified headers and body.
+func (r httpRequest) Patch(url string, headers map[string]string, body []byte) (*http.Response, error) {
+	return sendRequest(r.Config.TimeoutSeconds, http.MethodPatch, url, headers, body)
+}
+
+// Sends a DELETE request to the specified URL with the specified headers and body.
+func (r httpRequest) Delete(url string, headers map[string]string) (*http.Response, error) {
+	return sendRequest(r.Config.TimeoutSeconds, http.MethodDelete, url, headers, nil)
+}
+
+func sendRequest(timeSeconds int, method string, url string, headers map[string]string, body []byte) (*http.Response, error) {
 
 	// Create client for the service
-	client := newHttpClient(r.Config.TimeoutSeconds)
+	client := newHttpClient(timeSeconds)
+
+	reqBody := new(bytes.Buffer)
+	if body != nil {
+		reqBody = bytes.NewBuffer(body)
+	}
 
 	// Create a new request
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(body))
+	req, err := http.NewRequest(method, url, reqBody)
 	if err != nil {
 		return nil, err
 	}
-
 	setResponseHeaders(req, headers)
 
 	// Send the request
